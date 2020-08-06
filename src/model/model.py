@@ -4,22 +4,40 @@ from keras.applications.xception import Xception, preprocess_input
 from keras.layers import Flatten, Dense
 from keras import Model
 
-from data import load_train_data, load_test_data
+# from data import load_train_data, load_test_data
 
-# Load data
-train_data = load_train_data()
+class DpicNet():
+    def __init__(self, hidden1_nodes: int, hidden2_nodes: int):
+        # # Load data
+        # self.train_data = load_train_data()
 
-# Transfer Xception model
-xception_input = keras.Input(shape=train_data.image_shape)
-xception = Xception(include_top=False, input_tensor=xception_input)
+        # Transfer Xception model
+        self.xception_input = keras.Input(shape=train_data.image_shape)
+        self.xception = Xception(include_top=False, input_tensor=self.xception_input)
 
-# Classifier layers
-flat = Flatten()(xception.outputs)
-hidden1 = Dense(1536, activation='relu')(flat)
-hidden2 = Dense(512, activation='relu')(hidden1)
-output = Dense(train_data.num_classes, activation='softmax')(hidden2)
+        ## Mark as nontrainable
+        for layer in self.xception.layers:
+            layer.trainable = False
 
-# DpicNet
-model = Model(inputs=xception.inputs, outputs=output, name='DpicNet')
+        ## Flatten before classifier layers    
+        self.flat = Flatten()(self.xception.outputs)
 
-print(model.summary())
+        # Classifier layers
+        self.hidden1 = Dense(hidden1_nodes, activation='relu')(self.flat)
+        self.hidden2 = Dense(hidden2_nodes, activation='relu')(self.hidden1)
+        self.output = Dense(train_data.num_classes, activation='softmax')(self.hidden2)
+
+        # DpicNet
+        self.model = Model(inputs=self.xception.inputs, outputs=self.output, name='DpicNet')
+
+    def __str__(self):
+        return model.summary()
+    
+    def fit(data: tf.Tensor):
+        pass
+
+    def evaluate(data: tf.Tensor):
+        pass
+
+    def predict(images):
+        pass
