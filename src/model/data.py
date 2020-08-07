@@ -18,3 +18,10 @@ def load_test_data() -> DirectoryIterator:
     '''
 
     return loader.flow_from_directory(directory=f'{DATA_PATH}test/', target_size=(150,150))
+
+def load_predict_data():
+    '''
+    Load predict data (To be implemented)
+    '''
+
+    pass
