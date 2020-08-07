@@ -2,7 +2,7 @@ import tensorflow.keras.preprocessing as preprocessing
 from tensorflow.keras.applications.xception import preprocess_input
 from tensorflow.keras.preprocessing.image import DirectoryIterator
 
-DATA_PATH = '../data/'
+DATA_PATH = 'data/'
 loader = preprocessing.image.ImageDataGenerator(preprocessing_function=preprocess_input)
 
 def load_train_data() -> DirectoryIterator:
