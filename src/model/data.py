@@ -1,6 +1,10 @@
+import numpy as np
 import tensorflow.keras.preprocessing as preprocessing
 from tensorflow.keras.applications.xception import preprocess_input
-from tensorflow.keras.preprocessing.image import DirectoryIterator
+from tensorflow.keras.preprocessing.image import DirectoryIterator, load_img, img_to_array
+
+from PIL.JpegImagePlugin import JpegImageFile
+from typing import Union
 
 DATA_PATH = 'data/'
 loader = preprocessing.image.ImageDataGenerator(preprocessing_function=preprocess_input)
@@ -19,9 +23,17 @@ def load_test_data() -> DirectoryIterator:
 
     return loader.flow_from_directory(directory=f'{DATA_PATH}test/', target_size=(150,150))
 
-def load_predict_data():
+def load_predict_data(image: Union[str, JpegImageFile]) -> np.ndarray:
     '''
-    Load predict data (To be implemented)
+    Load an image for prediction
+
+    :param images: a path to image relative to src/ or a PIL.JpegImagePlugin.JpegImageFile object
+    :returns: np.ndarray representing the image
     '''
 
-    pass
+    if type(image) == str:
+        return preprocess_input(img_to_array(load_img(image, target_size=(150,150))))
+    elif type(image) == JpegImageFile:
+        return preprocess_input(img_to_array(image))
+    else:
+        raise ValueError(f'image argument of type {type(image)} is unacceptable')
