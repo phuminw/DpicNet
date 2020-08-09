@@ -1,58 +1,84 @@
 import numpy as np
-import tensorflow as tf
-import tensorflow.keras as keras
+# import tensorflow as tf
+# import tensorflow.keras as keras
+from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.xception import Xception
 from tensorflow.keras.layers import Flatten, Dense
 from tensorflow.keras import Sequential
 from tensorflow.keras.preprocessing.image import DirectoryIterator, load_img
+from tensorflow.keras.regularizers import l1_l2#, l1, l2
 
-from typing import Tuple
+from typing import Tuple, Union
 from PIL.JpegImagePlugin import JpegImageFile
 
 class DpicNet():
-    def __init__(self, input_shape: Tuple[int, int, int], classes: int, hidden1_nodes: int, hidden2_nodes: int, learning_rate: float):
-        # DpicNet model
-        self.model = Sequential(name='DpicNet')
+    def __init__(self, input_shape: Union[Tuple[int, int, int], bool], classes: int, hidden_nodes: Tuple[int, ...], regularize: Tuple[Union[None, str], ...]):
+        self._class_mapping = {0: 'buildings', 1: 'forest', 2: 'glacier', 3: 'mountain', 4: 'sea', 5: 'street'}
 
-        # Transfer Xception model
-        xception = Xception(include_top=False, input_shape=input_shape)
+        if input_shape != False: # input_shape is used as a flag whether to load saved model
+            # DpicNet model
+            self._model = Sequential(name='DpicNet')
 
-        ## Mark as nontrainable
-        for layer in xception.layers:
-            layer.trainable = False
-        
-        ## Add to DpicNet
-        self.model.add(xception)
+            # Transfer Xception model
+            xception = Xception(include_top=False, input_shape=input_shape)
 
-        ## Flatten before classifier layers    
-        self.model.add(Flatten())
+            ## Mark as nontrainable
+            for layer in xception.layers:
+                layer.trainable = False
+            
+            ## Add to DpicNet
+            self._model.add(xception)
 
-        ## Classifier layers
-        self.model.add(Dense(hidden1_nodes, activation='relu'))
-        self.model.add(Dense(hidden2_nodes, activation='relu'))
-        self.model.add(Dense(classes, activation='softmax'))
+            ## Flatten before classifier layers    
+            self._model.add(Flatten())
 
-        # DpicNet
-        self.model.compile(optimizer='adam', loss='categorical_crossentropy')
+            ## Classifier layers
+            for n, r in zip(hidden_nodes, regularize):
+                self._model.add(Dense(n, activation='relu', kernel_regularizer=l1_l2() if r == 'l1_l2' else r))
+
+            ## Output layer
+            self._model.add(Dense(classes, activation='softmax'))
+
+            # DpicNet
+            self._model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
     def __str__(self):
-        self.model.summary()
+        self._model.summary()
         return ''
+
+    def save(self, path: str) -> None:
+        '''
+        Save model in SavedModel format
+        '''
+        
+        self._model.save(path)
+
+    @classmethod
+    def load(cls, path: str):
+        '''
+        Load saved model from SavedModel format
+        '''
+
+        net = cls(False, 0, 0, 0)
+        net._model = load_model(path)
+        net._model.build(net._model.get_layer('xception').input_shape)
+        net._model.get_layer('xception').trainable = False
+
+        return net
     
     def fit(self, data: DirectoryIterator, epoch: int) -> None:
         '''
         Train model on the given data
         '''
 
-        self.class_mapping = {data.class_indices[c]:c for c in data.class_indices}
-        self.model.fit(data, epochs=epoch)
+        self._model.fit(data, epochs=epoch)
 
     def evaluate(self, data: DirectoryIterator) -> np.float64:
         '''
         Evaluate model accuracy on the given data
         '''
 
-        return self.model.evaluate(data)
+        return self._model.evaluate(data)
 
     def predict(self, image: np.ndarray) -> Tuple[int, str]:
         '''
@@ -64,5 +90,5 @@ class DpicNet():
 
         assert image.ndim == 3 and image.shape[0] == image.shape[1] == 150 and image.shape[2] == 3, 'An image must be in shape (150,150,3)'
 
-        pred_class = self.model.predict_classes(image.reshape(1,150,150,3))[0]
-        return (pred_class, self.class_mapping[pred_class])
+        pred_class = self._model.predict_classes(image.reshape(1,150,150,3))[0]
+        return (pred_class, self._class_mapping[pred_class])

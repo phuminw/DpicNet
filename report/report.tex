@@ -25,6 +25,7 @@
 % \usepackage{amsfonts}       % blackboard math symbols
 % \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 % \usepackage{microtype}      % microtypography
+\usepackage{caption}
 
 \title{DpicNet: A Transfer Learning Approach Towards Intel Multiclass Image Classification Dataset}
 
@@ -88,9 +89,120 @@ The dataset that we are targetting is located at \href{https://www.kaggle.com/pu
 
 \section{DpicNet}
 
+\subsection{Structure 1}
+
+In this structure, we designed the top parts of DpicNet to have 2 hidden layers with 512 and 128 nodes, respectively. All hidden layers are incorporated with a bias term, but no regulatization is applied to either the weight or the bias term.
+
+\subsection{Structure 2}
+
+In this structure, we increased the number of nodes of 2 hidden layers from Structure 1 to be 2048 and 1024 nodes, respectively. All hidden layers are incorporated with a bias term, but no regulatization is applied to either the weight or the bias term.
+
+\subsection{Structure 3}
+
+In this structure, we decreased the number of nodes of 2 hidden layers from Structure 1 to be 256 and 32 nodes, respectively. All hidden layers are incorporated with a bias term, but no regulatization is applied to either the weight or the bias term.
+
+\subsection{Structure 4}
+
+In this structure, we increased the number of nodes of 2 hidden layers from Structure 1 to be 8192 and 1024 nodes, respectively. All hidden layers are incorporated with a bias term, but no regulatization is applied to either the weight or the bias term.
+
 \section{Performance}
 
+Loss function used is categorical cross-entropy loss function. The batch size for all experiments is 32. 
+
+
+\subsection{Training Data}
+Each epoch contains 439 steps
+\begin{table}
+  \centering
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Epoch&Loss&Accuracy\\
+    \hline
+    1&0.7697&0.781\\
+    \hline
+    2&0.3522&0.8758\\
+    \hline
+    3&0.2424&0.9120\\
+    \hline
+    4&0.1798&0.9362\\
+    \hline
+    5&0.1248&0.9557\\
+    \hline
+    6&0.1135&0.9608\\
+    \hline
+    7&0.1253&0.9589\\
+    \hline
+    8&0.0786&0.9734\\
+    \hline
+    9&0.0696&0.9786\\
+    \hline
+    10&0.0713&0.9784\\
+    \hline
+  \end{tabular}
+  \caption*{Structure 1}
+
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Epoch&Loss&Accuracy\\
+    \hline
+    1&1.0170&0.7748\\
+    \hline
+    2&0.3853&0.8619\\
+    \hline
+    3&0.2634&0.9043\\
+    \hline
+    4&0.1818&0.9348\\
+    \hline
+    5&0.1483&0.9479\\
+    \hline
+    6&0.1179&0.9577\\
+    \hline
+    7&0.0871&0.9701\\
+    \hline
+    8&0.1059&0.9672\\
+    \hline
+    9&0.0648&0.9800\\
+    \hline
+    10&0.0526&0.9838\\
+    \hline
+  \end{tabular}
+  \caption*{Structure 2}
+
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Epoch&Loss&Accuracy\\
+    \hline
+    1&0.8542&0.7265\\
+    \hline
+    2&0.4299&0.8413\\
+    \hline
+    3&0.3207&0.8776\\
+    \hline
+    4&0.2548&0.9020\\
+    \hline
+    5&0.1937&0.9251\\
+    \hline
+    6&0.1589&0.9362\\
+    \hline
+    7&0.1552&0.9416\\
+    \hline
+    8&0.1301&0.9535\\
+    \hline
+    9&0.1012&0.9653\\
+    \hline
+    10&0.1114&0.9612\\
+    \hline
+  \end{tabular}
+  \caption*{Structure 3}
+\end{table}
+
 \subsection{Testing Data}
+
+Structure 1: Loss 1.1420924395639847, Accuracy 0.828
+\\\\
+Structure 2: Loss 1.5726730382822929, Accuracy 0.808
+\\\\
+Structure 3: Loss 0.7388046497994281, Accuracy 0.8196667
 
 \subsection{Prediction Data}
 
