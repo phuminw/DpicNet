@@ -28,10 +28,4 @@ src/
 
 Training and testing data are loaded by functions located in [data.py](src/model/data.py) with associated classes being inferred from the directory structure.
 
-## TODO
-
-- [ ] Complete necessary methods for `DpicNet()`
-- [ ] Create `main.py` under `src/` for executing DpicNet
-- [ ] Train/test on newly added FC layers (changing layers, nodes, biases, regularization, etc.)
-- [ ] Predict and put result into report
-- [ ] Complete report located under `report/`
+See [report.pdf](report/report.pdf) for more details

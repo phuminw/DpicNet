@@ -26,6 +26,9 @@
 % \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 % \usepackage{microtype}      % microtypography
 \usepackage{caption}
+\usepackage{graphicx}
+
+\linespread{1.25}
 
 \title{DpicNet: A Transfer Learning Approach Towards Intel Multiclass Image Classification Dataset}
 
@@ -38,33 +41,17 @@
 % \AND instead of \And before the third author name.
 
 \author{%
-  Phumin Walaipatchara \\
-  Department of Computer Science\\
-  Boston University\\
-  Boston, MA 02120 \\
-  \texttt{phuminw@bu.edu} \\
-  % examples of more authors
-  \And
   Xiaotong Niu \\
   Department of Computer Science\\
   Boston University\\
-  Boston, MA 02120 \\
+  Boston, MA 02215 \\
   \texttt{silnuext@bu.edu} \\
-  % \AND
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-  % \And
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
-  % \And
-  % Coauthor \\
-  % Affiliation \\
-  % Address \\
-  % \texttt{email} \\
+  \And
+  Phumin Walaipatchara \\
+  Department of Computer Science\\
+  Boston University\\
+  Boston, MA 02215 \\
+  \texttt{phuminw@bu.edu} \\
 }
 
 \begin{document}
@@ -75,6 +62,8 @@
   Abstract here
 \end{abstract}
 
+% ==========================================================================
+
 \section{Introduction}
 
 \subsection{Transfer Learning}
@@ -83,37 +72,72 @@
 
 \subsection{Dataset}
 
-The dataset that we are targetting is located at \href{https://www.kaggle.com/puneet6060/intel-image-classification}{Intel Multi-class Image Classification} containing images of natural scenes around the world. Originally, this dataset was used to host a image classification challenge by Intel. There are 25,000 images of size 150 x 150 pixels within 6 categories: buildings, forest, glacier, mountain, sea, and street. They are splitted into roughly 14,000 images for training, 3,000 images for testing, and 7,000 images for prediction. Images will be preprocessed to match the input requirement of the Xception model.
+The dataset that we are targeting is located at \href{https://www.kaggle.com/puneet6060/intel-image-classification}{Intel Multi-class Image Classification} containing images of natural scenes around the world. Originally, this dataset was used to host a image classification challenge by Intel. There are 25,000 images of size 150 x 150 pixels within 6 categories: buildings, forest, glacier, mountain, sea, and street. They are splitted into roughly 14,000 images for training, 3,000 images for testing, and 7,000 images for prediction. Images will be preprocessed to match the input requirement of the Xception model.
+
+% ==========================================================================
 
 \section{Prior Works}
 
-\section{DpicNet}
+\section{Methodology and Structure}
 
-\subsection{Structure 1}
+We conducted experiments on various fully-connected network structures on top on the transferred convolutional network from Xception. Our settings includes changing number of nodes in the hidden layers, adding more hidden layers, and imposing regularization (L1, L2, etc.) to the hidden layers. In all settings, all hidden layers are incorporated with a bias term. The experiments yield different performance on image classification as measured by categorical corss-entropy loss and accuracy, which are presented under Section 4 Result.
+
+\subsection{No Regularization}
+We started by constructing the hidden layers of the fully-connected part without any regularization
+\subsubsection{Structure 1}
 
 In this structure, we designed the top parts of DpicNet to have 2 hidden layers with 512 and 128 nodes, respectively. All hidden layers are incorporated with a bias term, but no regulatization is applied to either the weight or the bias term.
 
-\subsection{Structure 2}
+\subsubsection{Structure 2}
 
-In this structure, we increased the number of nodes of 2 hidden layers from Structure 1 to be 2048 and 1024 nodes, respectively. All hidden layers are incorporated with a bias term, but no regulatization is applied to either the weight or the bias term.
+In this structure, we increased the number of nodes of 2 hidden layers from Structure 1 to be 2048 and 1024 nodes, respectively. All hidden layers are incorporated with a bias term, but no regularization is applied to either the weight or the bias term.
 
-\subsection{Structure 3}
+\subsubsection{Structure 3}
 
-In this structure, we decreased the number of nodes of 2 hidden layers from Structure 1 to be 256 and 32 nodes, respectively. All hidden layers are incorporated with a bias term, but no regulatization is applied to either the weight or the bias term.
+In this structure, we decreased the number of nodes of 2 hidden layers from Structure 1 to be 256 and 32 nodes, respectively. All hidden layers are incorporated with a bias term, but no regularization is applied to either the weight or the bias term.
 
-\subsection{Structure 4}
+\subsubsection{Structure 4}
 
-In this structure, we increased the number of nodes of 2 hidden layers from Structure 1 to be 8192 and 1024 nodes, respectively. All hidden layers are incorporated with a bias term, but no regulatization is applied to either the weight or the bias term.
+In this structure, we increased the number of nodes of 2 hidden layers from Structure 1 to be 8192 and 1024 nodes, respectively. All hidden layers are incorporated with a bias term, but no regularization is applied to either the weight or the bias term.
 
-\section{Performance}
+\subsubsection{Structure 5}
 
-Loss function used is categorical cross-entropy loss function. The batch size for all experiments is 32. 
+In this structure, we increased the number of nodes of 2 hidden layers from Structure 1 to be 16384 and 4096 nodes, respectively. All hidden layers are incorporated with a bias term, but no regularization is applied to either the weight or the bias term.
 
+\subsection{With Regularization}
+
+We are going to add different types of regularization to our network and examine the difference in performance. We choose Structure 4 as a base structure and the regularization techniques to be experimented are L1, L2, and L1 and L2. We tested applying L1 regularization to both hidden layers; however, the network exhibits very poor performance with less than 20\% accuracy. Therefore, this setting is not included in this section. We also tested applying L1 regularization to one layer and L2 regularization to another layer, but this setting exhibits mediocre performance with about 67\% accuracy. Therefore, this setting is not included in this section as well.
+
+\subsubsection{Structure 6}
+
+In this structure, there are two hidden layers with 8192 and 1024 nodes, same as Structure 4, and those layers are incorporated with a bias term. In addition, L2 regularization is applied to both layers
+
+\subsection{Three hidden layers with no Regularization}
+
+Adding more hidden layers increases the model parameters while enables more capability to fit the data better. We are going to experiment whether adding more layers (from 2 to 3) can decrease the loss and increase the accuracy on the data (training, testing, predict). Moreover, we are going to examine the tradeoff between growing parameters, which requires more training time and consumes more space, and accuracy on the data.
+
+\subsubsection{Structure 7}
+
+Based on Structure 4, this structure differs by adding one more hidden layer on top of the existing hidden layers in Structure 4 with 256 nodes. All hidden layers are incorporated with a bias term and no regularization of any kind is applied to any hidden layer.
+
+\subsubsection{Structure 8}
+
+This structure is almost identical with Structure 7, except that the number of nodes in the newly added hidden layer is changed to 512.
+
+\subsection{}
+
+% ==========================================================================
+
+\section{Results}
+We recorded the loss and accuracy of each structure on training and testing dataset. Loss function used is categorical cross-entropy loss function. The batch size for all experiments is 32. 
 
 \subsection{Training Data}
-Each epoch contains 439 steps
-\begin{table}
+Because of batch size of 32, each epoch contains 439 steps. The experiment result of each structure is shown in Table 1. From the experiment result, Structure 2, 4, and 7 are outstanding in terms of accuracy at epoch 10. Structure 6, which incorporated L2 regularization to both layers, does not exhibit impressive performance despite training up to 40 epochs. Structure 7 and 8, which have 3 hidden layers with different number of nodes in the last hidden layer, performs well compared to Structure 1 - 4; however, adding more hidden layer does not significantly improve the performance on the training dataset.
+
+\begin{table}[]
   \centering
+  \begin{minipage}[b]{0.23\linewidth}
+  \tiny
   \begin{tabular}{|c|c|c|}
     \hline
     Epoch&Loss&Accuracy\\
@@ -140,7 +164,10 @@ Each epoch contains 439 steps
     \hline
   \end{tabular}
   \caption*{Structure 1}
-
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{0.23\linewidth}
+  \tiny
   \begin{tabular}{|c|c|c|}
     \hline
     Epoch&Loss&Accuracy\\
@@ -167,367 +194,261 @@ Each epoch contains 439 steps
     \hline
   \end{tabular}
   \caption*{Structure 2}
-
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{0.23\linewidth}
+  \tiny
   \begin{tabular}{|c|c|c|}
     \hline
     Epoch&Loss&Accuracy\\
     \hline
-    1&0.8542&0.7265\\
+    1&0.7723&0.7590\\
     \hline
-    2&0.4299&0.8413\\
+    2&0.3895&0.8669\\
     \hline
-    3&0.3207&0.8776\\
+    3&0.2822&0.9015\\
     \hline
-    4&0.2548&0.9020\\
+    4&0.2205&0.9220\\
     \hline
-    5&0.1937&0.9251\\
+    5&0.1826&0.9384\\
     \hline
-    6&0.1589&0.9362\\
+    6&0.1295&0.9555\\
     \hline
-    7&0.1552&0.9416\\
+    7&0.1031&0.9648\\
     \hline
-    8&0.1301&0.9535\\
+    8&0.1051&0.9656\\
     \hline
-    9&0.1012&0.9653\\
+    9&0.0784&0.9730\\
     \hline
-    10&0.1114&0.9612\\
+    10&0.0912&0.9705\\
     \hline
   \end{tabular}
   \caption*{Structure 3}
+  \end{minipage}
+  \\
+  \begin{minipage}[b]{0.23\linewidth}
+  \tiny
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Epoch&Loss&Accuracy\\
+    \hline
+    1&1.7312&0.7761\\
+    \hline
+    2&0.3870&0.8603\\
+    \hline
+    3&0.2559&0.9063\\
+    \hline
+    4&0.1886&0.9333\\
+    \hline
+    5&0.1396&0.9513\\
+    \hline
+    6&0.1151&0.9618\\
+    \hline
+    7&0.0848&0.9726\\
+    \hline
+    8&0.0832&0.9734\\
+    \hline
+    9&0.0846&0.9748\\
+    \hline
+    10&0.0515&0.9840\\
+    \hline
+  \end{tabular}
+  \caption*{Structure 4}
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{0.23\linewidth}
+  \tiny
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Epoch&Loss&Accuracy\\
+    \hline
+    1&2.4641&0.7775\\
+    \hline
+    2&0.3616&0.8706\\
+    \hline
+    3&0.2905&0.9042\\
+    \hline
+    4&0.2051&0.9287\\
+    \hline
+    5&0.1535&0.9471\\
+    \hline
+    6&0.1257&0.9583\\
+    \hline
+    7&0.1538&0.9603\\
+    \hline
+    8&0.0834&0.9722\\
+    \hline
+    9&0.0683&0.9776\\
+    \hline
+    10&0.0730&0.9797\\
+    \hline
+  \end{tabular}
+  \caption*{Structure 5}
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{0.23\linewidth}
+  \tiny
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Epoch&Loss&Accuracy\\
+    \hline
+    1&11.6508&0.7146\\
+    \hline
+    2&2.7279&0.7545\\
+    \hline
+    3&2.0377&0.7770\\
+    \hline
+    4&2.0157&0.7779\\
+    \hline
+    5&1.7358&0.7926\\
+    \hline
+    6&1.5305&0.8003\\
+    \hline
+    7&1.3250&0.8088\\
+    \hline
+    8&1.2319&0.8123\\
+    \hline
+    9&1.1533&0.8154\\
+    \hline
+    10&1.0536&0.8180\\
+    \hline
+    20&0.7546&0.8336\\
+    \hline
+    30&0.6780&0.8423\\
+    \hline
+    40&0.6588&0.8439\\
+    \hline
+  \end{tabular}
+  \caption*{Structure 6}
+  \end{minipage}
+  \\
+  \begin{minipage}[b]{0.23\linewidth}
+  \tiny
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Epoch&Loss&Accuracy\\
+    \hline
+    1&1.4817&0.7720\\
+    \hline
+    2&0.3707&0.8663\\
+    \hline
+    3&0.2519&0.9057\\
+    \hline
+    4&0.1884&0.9317\\
+    \hline
+    5&0.1469&0.9512\\
+    \hline
+    6&0.1170&0.9632\\
+    \hline
+    7&0.0929&0.9694\\
+    \hline
+    8&0.0954&0.9708\\
+    \hline
+    9&0.0886&0.9721\\
+    \hline
+    10&0.0597&0.9818\\
+    \hline
+  \end{tabular}
+  \caption*{Structure 7}
+  \end{minipage}
+  \hspace{0.5cm}
+  \begin{minipage}[b]{0.23\linewidth}
+  \tiny
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Epoch&Loss&Accuracy\\
+    \hline
+    1&1.3941&0.7753\\
+    \hline
+    2&0.3921&0.8603\\
+    \hline
+    3&0.2674&0.9026\\
+    \hline
+    4&0.1950&0.9303\\
+    \hline
+    5&0.1589&0.9466\\
+    \hline
+    6&0.1189&0.9608\\
+    \hline
+    7&0.0974&0.9676\\
+    \hline
+    8&0.0669&0.9778\\
+    \hline
+    9&0.0771&0.9766\\
+    \hline
+    10&0.0724&0.9780\\
+    \hline
+  \end{tabular}
+  \caption*{Structure 8}
+  \end{minipage}
+  \caption{Accuracy and Loss on Training Data}
+  \label{t1:acc_loss_train_tab}
 \end{table}
 
 \subsection{Testing Data}
 
-Structure 1: Loss 1.1420924395639847, Accuracy 0.828
-\\\\
-Structure 2: Loss 1.5726730382822929, Accuracy 0.808
-\\\\
-Structure 3: Loss 0.7388046497994281, Accuracy 0.8196667
+After training, each structure was tested on testing data using batch size of 32 and the testing was done after 94 steps. The performance is evaluated based on accuracy on the testing data and shown in Table 2. Structure 3 performs the best among all structures experimented despite no regularization applied and less hidden layers.
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    \#&Loss&Accuracy\\
+    \hline
+    1&1.142&0.828\\
+    \hline
+    2&1.573&0.808\\
+    \hline
+    3&0.843&0.867\\
+    \hline
+    4&1.384&0.843\\
+    \hline
+    5&1.730&0.838\\
+    \hline
+    6&0.706&0.824\\
+    \hline
+    7&1.646&0.788\\
+    \hline
+    8&1.689&0.837\\
+    \hline
+    \end{tabular}
+    \caption{Accuracy and Loss on Testing Data}
+    \label{t2:acc_loss_test_tab}
+\end{table}
 
 \subsection{Prediction Data}
 
+We chose Structure 6, which performs the best on testing data in terms of loss, instead of other good performers on training data since the model can perform impressively on training data by fitting into the training data, but might not be able to generalize to unseen data like testing data.
+
+\begin{center}
+    \includegraphics[scale=0.68]{assets/s6.png}
+\end{center}
+
+Five random images are chosen from images under \textit{src/data/predict/} directory. These images do not have label, so we are going to evaluate based on our knowledge whether the prediction is acceptable. The result is quite impressive as all five images are classified into their correct categories despite abut 82\% accuracy on testing data.
+
+% ==========================================================================
+
+\section{Performance and Discussion}
+
+% ==========================================================================
+
 \section{Conclusion}
 
+% ==========================================================================
+
+% \begin{thebibliography}
+% % reference
+%     \bibitem{Chollet_2017_CVPR}
+%     % \bibitem{reference}
+%     % \textbf{[1] }author name
+%     % \textit{reference name}.
+%     % publication
+    
+%     % \bibitem{reference1}
+%     % \textbf{[1] }author name
+%     % \textit{reference name}.
+%     % publication
+
+% \end{thebibliography}
+
 \end{document}
-
-% Papers to be submitted to NeurIPS 2020 must be prepared according to the
-% instructions presented here. Papers may only be up to eight pages long,
-% including figures. Additional pages \emph{containing only a section on the broader impact, acknowledgments and/or cited references} are allowed. Papers that exceed eight pages of content will not be reviewed, or in any other way considered for
-% presentation at the conference.
-
-% The margins in 2020 are the same as those in 2007, which allow for $\sim$$15\%$
-% more words in the paper compared to earlier years.
-
-% Authors are required to use the NeurIPS \LaTeX{} style files obtainable at the
-% NeurIPS website as indicated below. Please make sure you use the current files
-% and not previous versions. Tweaking the style files may be grounds for
-% rejection.
-
-% \subsection{Retrieval of style files}
-
-% The style files for NeurIPS and other conference information are available on
-% the World Wide Web at
-% \begin{center}
-%   \url{http://www.neurips.cc/}
-% \end{center}
-% The file \verb+neurips_2020.pdf+ contains these instructions and illustrates the
-% various formatting requirements your NeurIPS paper must satisfy.
-
-% The only supported style file for NeurIPS 2020 is \verb+neurips_2020.sty+,
-% rewritten for \LaTeXe{}.  \textbf{Previous style files for \LaTeX{} 2.09,
-%   Microsoft Word, and RTF are no longer supported!}
-
-% The \LaTeX{} style file contains three optional arguments: \verb+final+, which
-% creates a camera-ready copy, \verb+preprint+, which creates a preprint for
-% submission to, e.g., arXiv, and \verb+nonatbib+, which will not load the
-% \verb+natbib+ package for you in case of package clash.
-
-% \paragraph{Preprint option}
-% If you wish to post a preprint of your work online, e.g., on arXiv, using the
-% NeurIPS style, please use the \verb+preprint+ option. This will create a
-% nonanonymized version of your work with the text ``Preprint. Work in progress.''
-% in the footer. This version may be distributed as you see fit. Please \textbf{do
-%   not} use the \verb+final+ option, which should \textbf{only} be used for
-% papers accepted to NeurIPS.
-
-% At submission time, please omit the \verb+final+ and \verb+preprint+
-% options. This will anonymize your submission and add line numbers to aid
-% review. Please do \emph{not} refer to these line numbers in your paper as they
-% will be removed during generation of camera-ready copies.
-
-% The file \verb+neurips_2020.tex+ may be used as a ``shell'' for writing your
-% paper. All you have to do is replace the author, title, abstract, and text of
-% the paper with your own.
-
-% The formatting instructions contained in these style files are summarized in
-% Sections \ref{gen_inst}, \ref{headings}, and \ref{others} below.
-
-% \section{General formatting instructions}
-% \label{gen_inst}
-
-% The text must be confined within a rectangle 5.5~inches (33~picas) wide and
-% 9~inches (54~picas) long. The left margin is 1.5~inch (9~picas).  Use 10~point
-% type with a vertical spacing (leading) of 11~points.  Times New Roman is the
-% preferred typeface throughout, and will be selected for you by default.
-% Paragraphs are separated by \nicefrac{1}{2}~line space (5.5 points), with no
-% indentation.
-
-% The paper title should be 17~point, initial caps/lower case, bold, centered
-% between two horizontal rules. The top rule should be 4~points thick and the
-% bottom rule should be 1~point thick. Allow \nicefrac{1}{4}~inch space above and
-% below the title to rules. All pages should start at 1~inch (6~picas) from the
-% top of the page.
-
-% For the final version, authors' names are set in boldface, and each name is
-% centered above the corresponding address. The lead author's name is to be listed
-% first (left-most), and the co-authors' names (if different address) are set to
-% follow. If there is only one co-author, list both author and co-author side by
-% side.
-
-% Please pay special attention to the instructions in Section \ref{others}
-% regarding figures, tables, acknowledgments, and references.
-
-% \section{Headings: first level}
-% \label{headings}
-
-% All headings should be lower case (except for first word and proper nouns),
-% flush left, and bold.
-
-% First-level headings should be in 12-point type.
-
-% \subsection{Headings: second level}
-
-% Second-level headings should be in 10-point type.
-
-% \subsubsection{Headings: third level}
-
-% Third-level headings should be in 10-point type.
-
-% \paragraph{Paragraphs}
-
-% There is also a \verb+\paragraph+ command available, which sets the heading in
-% bold, flush left, and inline with the text, with the heading followed by 1\,em
-% of space.
-
-% \section{Citations, figures, tables, references}
-% \label{others}
-
-% These instructions apply to everyone.
-
-% \subsection{Citations within the text}
-
-% The \verb+natbib+ package will be loaded for you by default.  Citations may be
-% author/year or numeric, as long as you maintain internal consistency.  As to the
-% format of the references themselves, any style is acceptable as long as it is
-% used consistently.
-
-% The documentation for \verb+natbib+ may be found at
-% \begin{center}
-%   \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-% \end{center}
-% Of note is the command \verb+\citet+, which produces citations appropriate for
-% use in inline text.  For example,
-% \begin{verbatim}
-%    \citet{hasselmo} investigated\dots
-% \end{verbatim}
-% produces
-% \begin{quote}
-%   Hasselmo, et al.\ (1995) investigated\dots
-% \end{quote}
-
-% If you wish to load the \verb+natbib+ package with options, you may add the
-% following before loading the \verb+neurips_2020+ package:
-% \begin{verbatim}
-%    \PassOptionsToPackage{options}{natbib}
-% \end{verbatim}
-
-% If \verb+natbib+ clashes with another package you load, you can add the optional
-% argument \verb+nonatbib+ when loading the style file:
-% \begin{verbatim}
-%    \usepackage[nonatbib]{neurips_2020}
-% \end{verbatim}
-
-% As submission is double blind, refer to your own published work in the third
-% person. That is, use ``In the previous work of Jones et al.\ [4],'' not ``In our
-% previous work [4].'' If you cite your other papers that are not widely available
-% (e.g., a journal paper under review), use anonymous author names in the
-% citation, e.g., an author of the form ``A.\ Anonymous.''
-
-% \subsection{Footnotes}
-
-% Footnotes should be used sparingly.  If you do require a footnote, indicate
-% footnotes with a number\footnote{Sample of the first footnote.} in the
-% text. Place the footnotes at the bottom of the page on which they appear.
-% Precede the footnote with a horizontal rule of 2~inches (12~picas).
-
-% Note that footnotes are properly typeset \emph{after} punctuation
-% marks.\footnote{As in this example.}
-
-% \subsection{Figures}
-
-% \begin{figure}
-%   \centering
-%   \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-%   \caption{Sample figure caption.}
-% \end{figure}
-
-% All artwork must be neat, clean, and legible. Lines should be dark enough for
-% purposes of reproduction. The figure number and caption always appear after the
-% figure. Place one line space before the figure caption and one line space after
-% the figure. The figure caption should be lower case (except for first word and
-% proper nouns); figures are numbered consecutively.
-
-% You may use color figures.  However, it is best for the figure captions and the
-% paper body to be legible if the paper is printed in either black/white or in
-% color.
-
-% \subsection{Tables}
-
-% All tables must be centered, neat, clean and legible.  The table number and
-% title always appear before the table.  See Table~\ref{sample-table}.
-
-% Place one line space before the table title, one line space after the
-% table title, and one line space after the table. The table title must
-% be lower case (except for first word and proper nouns); tables are
-% numbered consecutively.
-
-% Note that publication-quality tables \emph{do not contain vertical rules.} We
-% strongly suggest the use of the \verb+booktabs+ package, which allows for
-% typesetting high-quality, professional tables:
-% \begin{center}
-%   \url{https://www.ctan.org/pkg/booktabs}
-% \end{center}
-% This package was used to typeset Table~\ref{sample-table}.
-
-% \begin{table}
-%   \caption{Sample table title}
-%   \label{sample-table}
-%   \centering
-%   \begin{tabular}{lll}
-%     \toprule
-%     \multicolumn{2}{c}{Part}                   \\
-%     \cmidrule(r){1-2}
-%     Name     & Description     & Size ($\mu$m) \\
-%     \midrule
-%     Dendrite & Input terminal  & $\sim$100     \\
-%     Axon     & Output terminal & $\sim$10      \\
-%     Soma     & Cell body       & up to $10^6$  \\
-%     \bottomrule
-%   \end{tabular}
-% \end{table}
-
-% \section{Final instructions}
-
-% Do not change any aspects of the formatting parameters in the style files.  In
-% particular, do not modify the width or length of the rectangle the text should
-% fit into, and do not change font sizes (except perhaps in the
-% \textbf{References} section; see below). Please note that pages should be
-% numbered.
-
-% \section{Preparing PDF files}
-
-% Please prepare submission files with paper size ``US Letter,'' and not, for
-% example, ``A4.''
-
-% Fonts were the main cause of problems in the past years. Your PDF file must only
-% contain Type 1 or Embedded TrueType fonts. Here are a few instructions to
-% achieve this.
-
-% \begin{itemize}
-
-% \item You should directly generate PDF files using \verb+pdflatex+.
-
-% \item You can check which fonts a PDF files uses.  In Acrobat Reader, select the
-%   menu Files$>$Document Properties$>$Fonts and select Show All Fonts. You can
-%   also use the program \verb+pdffonts+ which comes with \verb+xpdf+ and is
-%   available out-of-the-box on most Linux machines.
-
-% \item The IEEE has recommendations for generating PDF files whose fonts are also
-%   acceptable for NeurIPS. Please see
-%   \url{http://www.emfield.org/icuwb2010/downloads/IEEE-PDF-SpecV32.pdf}
-
-% \item \verb+xfig+ "patterned" shapes are implemented with bitmap fonts.  Use
-%   "solid" shapes instead.
-
-% \item The \verb+\bbold+ package almost always uses bitmap fonts.  You should use
-%   the equivalent AMS Fonts:
-% \begin{verbatim}
-%    \usepackage{amsfonts}
-% \end{verbatim}
-% followed by, e.g., \verb+\mathbb{R}+, \verb+\mathbb{N}+, or \verb+\mathbb{C}+
-% for $\mathbb{R}$, $\mathbb{N}$ or $\mathbb{C}$.  You can also use the following
-% workaround for reals, natural and complex:
-% \begin{verbatim}
-%    \newcommand{\RR}{I\!\!R} %real numbers
-%    \newcommand{\Nat}{I\!\!N} %natural numbers
-%    \newcommand{\CC}{I\!\!\!\!C} %complex numbers
-% \end{verbatim}
-% Note that \verb+amsfonts+ is automatically loaded by the \verb+amssymb+ package.
-
-% \end{itemize}
-
-% If your file contains type 3 fonts or non embedded TrueType fonts, we will ask
-% you to fix it.
-
-% \subsection{Margins in \LaTeX{}}
-
-% Most of the margin problems come from figures positioned by hand using
-% \verb+\special+ or other commands. We suggest using the command
-% \verb+\includegraphics+ from the \verb+graphicx+ package. Always specify the
-% figure width as a multiple of the line width as in the example below:
-% \begin{verbatim}
-%    \usepackage[pdftex]{graphicx} ...
-%    \includegraphics[width=0.8\linewidth]{myfile.pdf}
-% \end{verbatim}
-% See Section 4.4 in the graphics bundle documentation
-% (\url{http://mirrors.ctan.org/macros/latex/required/graphics/grfguide.pdf})
-
-% A number of width problems arise when \LaTeX{} cannot properly hyphenate a
-% line. Please give LaTeX hyphenation hints using the \verb+\-+ command when
-% necessary.
-
-
-% \section*{Broader Impact}
-
-% Authors are required to include a statement of the broader impact of their work, including its ethical aspects and future societal consequences. 
-% Authors should discuss both positive and negative outcomes, if any. For instance, authors should discuss a) 
-% who may benefit from this research, b) who may be put at disadvantage from this research, c) what are the consequences of failure of the system, and d) whether the task/method leverages
-% biases in the data. If authors believe this is not applicable to them, authors can simply state this.
-
-% Use unnumbered first level headings for this section, which should go at the end of the paper. {\bf Note that this section does not count towards the eight pages of content that are allowed.}
-
-% \begin{ack}
-% Use unnumbered first level headings for the acknowledgments. All acknowledgments
-% go at the end of the paper before the list of references. Moreover, you are required to declare 
-% funding (financial activities supporting the submitted work) and competing interests (related financial activities outside the submitted work). 
-% More information about this disclosure can be found at: \url{https://neurips.cc/Conferences/2020/PaperInformation/FundingDisclosure}.
-
-
-% Do {\bf not} include this section in the anonymized submission, only in the final paper. You can use the \texttt{ack} environment provided in the style file to autmoatically hide this section in the anonymized submission.
-% \end{ack}
-
-% \section*{References}
-
-% References follow the acknowledgments. Use unnumbered first-level heading for
-% the references. Any choice of citation style is acceptable as long as you are
-% consistent. It is permissible to reduce the font size to \verb+small+ (9 point)
-% when listing the references.
-% {\bf Note that the Reference section does not count towards the eight pages of content that are allowed.}
-% \medskip
-
-% \small
-
-% [1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms for
-% connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky and T.K.\ Leen
-% (eds.), {\it Advances in Neural Information Processing Systems 7},
-% pp.\ 609--616. Cambridge, MA: MIT Press.
-
-% [2] Bower, J.M.\ \& Beeman, D.\ (1995) {\it The Book of GENESIS: Exploring
-%   Realistic Neural Models with the GEneral NEural SImulation System.}  New York:
-% TELOS/Springer--Verlag.
-
-% [3] Hasselmo, M.E., Schnell, E.\ \& Barkai, E.\ (1995) Dynamics of learning and
-% recall at excitatory recurrent synapses and cholinergic modulation in rat
-% hippocampal region CA3. {\it Journal of Neuroscience} {\bf 15}(7):5249-5262.
-
-% \end{document}
